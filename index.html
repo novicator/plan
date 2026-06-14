@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#c0392b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Plans">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>Plans</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0000;
+      color: #fff;
+      min-height: 100dvh;
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
+    }
+
+    .view {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hidden { display: none !important; }
+
+    /* ── Header ── */
+    .header {
+      padding: 44px 24px 8px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: #fff;
+      line-height: 1;
+    }
+
+    /* ── Detail header ── */
+    .detail-header {
+      padding: 28px 24px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      color: #c0392b;
+      font-size: 16px;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      width: fit-content;
+    }
+
+    .detail-plan-name {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #fff;
+      line-height: 1.2;
+      word-break: break-word;
+      background: transparent;
+      border: none;
+      outline: none;
+      width: 100%;
+      font-family: inherit;
+      caret-color: #c0392b;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    /* ── Content ── */
+    .content {
+      flex: 1;
+      padding: 16px 24px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ── Primary button ── */
+    .primary-btn {
+      width: 100%;
+      background: #c0392b;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-size: 24px;
+      font-weight: 700;
+      font-family: inherit;
+      letter-spacing: 0.2px;
+      padding: 14px 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(192,57,43,0.5), 0 2px 8px rgba(0,0,0,0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .primary-btn:active {
+      transform: scale(0.97);
+      background: #a93226;
+      box-shadow: 0 2px 10px rgba(192,57,43,0.35), 0 1px 4px rgba(0,0,0,0.35);
+    }
+
+    @media (hover: hover) {
+      .primary-btn:hover {
+        background: #cb4335;
+        box-shadow: 0 6px 28px rgba(192,57,43,0.6), 0 2px 8px rgba(0,0,0,0.35);
+      }
+    }
+
+    /* ── Plan list items ── */
+    .plan-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .plan-item {
+      background: #1a0505;
+      border: 1px solid #2d0808;
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+
+    .plan-item:active { background: #220a0a; }
+
+    .plan-item-name {
+      font-size: 17px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .plan-item-meta {
+      font-size: 13px;
+      color: #6a2020;
+      margin-top: 3px;
+    }
+
+    .plan-item-arrow { color: #4a1515; font-size: 20px; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .empty-icon { width: 56px; height: 56px; opacity: 0.12; }
+
+    .empty-text {
+      font-size: 15px;
+      color: #4a1a1a;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    /* ── Node connector ── */
+    .node-list { display: flex; flex-direction: column; }
+
+    .node-connector {
+      display: flex;
+      justify-content: center;
+      position: relative;
+      height: 40px;
+    }
+
+    .node-connector-line {
+      width: 3px;
+      height: 100%;
+      border-radius: 2px;
+      background: #2a0606;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .node-connector-line::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      top: 0;
+      height: 70%;
+      background: linear-gradient(to bottom, transparent 0%, #e74c3c 45%, #ff6b55 50%, #e74c3c 55%, transparent 100%);
+      animation: line-flow 2.8s linear infinite;
+      filter: blur(0.5px);
+    }
+
+    @keyframes line-flow {
+      0%   { transform: translateY(-100%); }
+      100% { transform: translateY(245%); }
+    }
+
+    /* ── Node cards ── */
+
+    .node-card {
+      background: #160303;
+      border: 1px solid #2d0808;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+      transition: opacity 0.15s ease, box-shadow 0.15s ease;
+      touch-action: none;
+    }
+
+    .node-card.dragging {
+      opacity: 0.4;
+    }
+
+    .node-card.drag-over {
+      box-shadow: 0 0 0 2px #c0392b, 0 4px 20px rgba(192,57,43,0.4);
+    }
+
+    .node-title-row {
+      background: #7a1f1f;
+      padding: 13px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .node-drag-handle {
+      cursor: grab;
+      flex-shrink: 0;
+      color: rgba(255,255,255,0.3);
+      font-size: 15px;
+      line-height: 1;
+      padding: 2px 0;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .node-drag-handle:active { cursor: grabbing; }
+
+    /* floating ghost during drag */
+    .drag-ghost {
+      position: fixed;
+      pointer-events: none;
+      z-index: 1000;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1.5px solid #e74c3c;
+      box-shadow: 0 24px 50px rgba(0,0,0,0.8), 0 0 24px rgba(231,76,60,0.45);
+      transform: rotate(1.5deg) scale(1.03);
+      background: #2a0808;
+    }
+
+    .drag-ghost .node-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #7a1f1f;
+      padding: 13px 16px;
+    }
+
+    .drag-ghost-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .node-collapse-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      font-size: 18px;
+      line-height: 1;
+      transition: transform 0.2s ease, color 0.15s ease;
+    }
+
+    .node-collapse-btn:hover { color: rgba(255,255,255,0.85); }
+
+    .node-card.collapsed .node-collapse-btn { transform: rotate(-90deg); }
+
+    .node-card.collapsed .node-desc-row { display: none; }
+
+    .node-title-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      caret-color: #ffaaaa;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .node-title-input::placeholder { color: rgba(255,255,255,0.3); }
+
+    .node-desc-row {
+      padding: 13px 16px;
+    }
+
+    .node-desc-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #c9a0a0;
+      font-size: 15px;
+      font-family: inherit;
+      line-height: 1.55;
+      resize: none;
+      min-height: 56px;
+      caret-color: #fff;
+      -webkit-appearance: none;
+      appearance: none;
+      overflow: hidden;
+    }
+
+    .node-desc-input::placeholder { color: rgba(255,255,255,0.18); }
+
+    /* ── Modal (bottom sheet) ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 24px;
+    }
+
+    .modal-sheet {
+      background: #1a0505;
+      border: 1px solid #2d0808;
+      border-radius: 24px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-label {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    .modal-input {
+      width: 100%;
+      background: #2a0808;
+      border: 1.5px solid #3d1010;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 17px;
+      font-family: inherit;
+      padding: 15px 16px;
+      outline: none;
+      caret-color: #c0392b;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .modal-input:focus { border-color: #c0392b; }
+    .modal-input::placeholder { color: #5a2020; }
+
+    .modal-create-btn {
+      font-size: 17px;
+      padding: 16px 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── LIST VIEW ── -->
+  <div id="listView" class="view">
+    <div class="header">
+      <h1>Plans</h1>
+    </div>
+    <div class="content">
+      <button class="primary-btn" id="newPlanBtn">+ New Plan</button>
+      <div class="plan-list" id="planList"></div>
+      <div class="empty-state" id="emptyState">
+        <svg class="empty-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="4" width="6" height="56" rx="3" fill="white"/>
+          <circle cx="9" cy="13" r="3.5" fill="#0f0000"/>
+          <circle cx="9" cy="27" r="3.5" fill="#0f0000"/>
+          <circle cx="9" cy="41" r="3.5" fill="#0f0000"/>
+          <circle cx="9" cy="55" r="3.5" fill="#0f0000"/>
+          <rect x="12" y="4" width="46" height="56" rx="5" fill="white"/>
+          <line x1="22" y1="21" x2="50" y2="21" stroke="#0f0000" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="22" y1="32" x2="50" y2="32" stroke="#0f0000" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="22" y1="43" x2="38" y2="43" stroke="#0f0000" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <p class="empty-text">No plans yet.<br>Tap + New Plan to get started.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DETAIL VIEW ── -->
+  <div id="detailView" class="view hidden">
+    <div class="detail-header">
+      <button class="back-btn" id="backBtn">‹ Plans</button>
+      <input class="detail-plan-name" id="detailTitle" type="text" maxlength="80" autocomplete="off" autocorrect="off">
+    </div>
+    <div class="content">
+      <button class="primary-btn" id="addNodeBtn" style="font-size:17px; padding:12px 24px;">+ Add Node</button>
+      <div class="node-list" id="nodeList"></div>
+    </div>
+  </div>
+
+  <!-- ── MODAL: name the plan ── -->
+  <div id="modal" class="modal-overlay hidden">
+    <div class="modal-sheet">
+      <div class="modal-label">New Plan</div>
+      <input
+        class="modal-input"
+        id="planNameInput"
+        type="text"
+        placeholder="e.g. Cybersecurity job hunt"
+        maxlength="80"
+        autocomplete="off"
+        autocorrect="off"
+      >
+      <button class="primary-btn modal-create-btn" id="createPlanBtn">Create Plan</button>
+    </div>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+
+    /* ── State ── */
+    let state = JSON.parse(localStorage.getItem('plans-data') || '{"plans":[]}');
+    let currentPlanId = null;
+
+    function save() {
+      localStorage.setItem('plans-data', JSON.stringify(state));
+    }
+
+    function uid() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    }
+
+    function esc(str) {
+      return (str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    /* ── View switching ── */
+    const $list   = document.getElementById('listView');
+    const $detail = document.getElementById('detailView');
+
+    function showList() {
+      $detail.classList.add('hidden');
+      $list.classList.remove('hidden');
+      renderPlans();
+    }
+
+    function showDetail(planId) {
+      currentPlanId = planId;
+      $list.classList.add('hidden');
+      $detail.classList.remove('hidden');
+      const plan = state.plans.find(p => p.id === planId);
+      const titleEl = document.getElementById('detailTitle');
+      titleEl.value = plan.name;
+      titleEl.oninput = () => { plan.name = titleEl.value; save(); renderPlans(); };
+      renderNodes();
+    }
+
+    /* ── Render plans ── */
+    function renderPlans() {
+      const list  = document.getElementById('planList');
+      const empty = document.getElementById('emptyState');
+      list.innerHTML = '';
+      if (state.plans.length === 0) {
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+      state.plans.forEach(plan => {
+        const n = plan.nodes.length;
+        const item = document.createElement('div');
+        item.className = 'plan-item';
+        item.innerHTML = `
+          <div>
+            <div class="plan-item-name">${esc(plan.name)}</div>
+            <div class="plan-item-meta">${n} ${n === 1 ? 'node' : 'nodes'}</div>
+          </div>
+          <span class="plan-item-arrow">›</span>
+        `;
+        item.addEventListener('click', () => showDetail(plan.id));
+        list.appendChild(item);
+      });
+    }
+
+    /* ── Render nodes ── */
+    function renderNodes() {
+      const list = document.getElementById('nodeList');
+      list.innerHTML = '';
+      const plan = state.plans.find(p => p.id === currentPlanId);
+      if (!plan) return;
+      plan.nodes.forEach((node, i) => {
+        if (i > 0) list.appendChild(buildConnector(i));
+        list.appendChild(buildNodeCard(node));
+      });
+    }
+
+    function buildConnector(idx) {
+      const el = document.createElement('div');
+      el.className = 'node-connector';
+      el.innerHTML = `<div class="node-connector-line" style="animation-delay:${((idx - 1) * 0.4) % 2}s"></div>`;
+      return el;
+    }
+
+    function buildNodeCard(node) {
+      const card = document.createElement('div');
+      card.className = 'node-card';
+      card.innerHTML = `
+        <div class="node-title-row">
+          <span class="node-drag-handle" title="Drag to reorder">⠿</span>
+          <input class="node-title-input" type="text" placeholder="Title" value="${esc(node.title)}" maxlength="120">
+          <button class="node-collapse-btn" title="Collapse">⌄</button>
+        </div>
+        <div class="node-desc-row">
+          <textarea class="node-desc-input" placeholder="Description...">${esc(node.desc)}</textarea>
+        </div>
+      `;
+      card.classList.add('collapsed');
+
+      const titleEl    = card.querySelector('.node-title-input');
+      const descEl     = card.querySelector('.node-desc-input');
+      const collapseEl = card.querySelector('.node-collapse-btn');
+
+      titleEl.addEventListener('input', () => { node.title = titleEl.value; save(); });
+      descEl.addEventListener('input',  () => { node.desc  = descEl.value;  autoResize(descEl); save(); });
+
+      collapseEl.addEventListener('click', () => {
+        card.classList.toggle('collapsed');
+      });
+
+      initDrag(card, node);
+      setTimeout(() => autoResize(descEl), 0);
+      return card;
+    }
+
+    function autoResize(el) {
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
+    }
+
+    /* ── Drag to reorder ── */
+    function initDrag(card, node) {
+      const handle = card.querySelector('.node-drag-handle');
+      card.dataset.nodeId = node.id;
+
+      let ghost = null;
+      let overCard = null;
+      let offsetX = 0, offsetY = 0;
+
+      handle.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        handle.setPointerCapture(e.pointerId);
+
+        const rect = card.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+
+        ghost = document.createElement('div');
+        ghost.className = 'drag-ghost';
+        ghost.style.left = rect.left + 'px';
+        ghost.style.top  = rect.top  + 'px';
+        ghost.style.width = rect.width + 'px';
+        ghost.innerHTML = `
+          <div class="node-title-row">
+            <span class="node-drag-handle">⠿</span>
+            <span class="drag-ghost-title">${esc(node.title || 'Untitled')}</span>
+          </div>
+        `;
+        document.body.appendChild(ghost);
+        card.classList.add('dragging');
+      });
+
+      handle.addEventListener('pointermove', e => {
+        if (!ghost) return;
+        ghost.style.left = (e.clientX - offsetX) + 'px';
+        ghost.style.top  = (e.clientY - offsetY) + 'px';
+
+        // find card under pointer (hide ghost briefly so elementFromPoint works)
+        ghost.style.visibility = 'hidden';
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        ghost.style.visibility = '';
+
+        const target = el && el.closest('#nodeList .node-card');
+        if (overCard && overCard !== target) overCard.classList.remove('drag-over');
+        overCard = (target && target !== card) ? target : null;
+        if (overCard) overCard.classList.add('drag-over');
+      });
+
+      handle.addEventListener('pointerup', () => {
+        if (!ghost) return;
+        ghost.remove();
+        ghost = null;
+        card.classList.remove('dragging');
+        if (overCard) {
+          overCard.classList.remove('drag-over');
+          const targetId = overCard.dataset.nodeId;
+          overCard = null;
+          if (targetId) dropNode(node.id, targetId);
+        }
+      });
+    }
+
+    function dropNode(srcId, targetId) {
+      const plan = state.plans.find(p => p.id === currentPlanId);
+      const srcIdx = plan.nodes.findIndex(n => n.id === srcId);
+      const tgtIdx = plan.nodes.findIndex(n => n.id === targetId);
+      if (srcIdx === -1 || tgtIdx === -1) return;
+      const [moved] = plan.nodes.splice(srcIdx, 1);
+      plan.nodes.splice(tgtIdx, 0, moved);
+      save();
+      renderNodes();
+    }
+
+    /* ── "+ New Plan" ── */
+    document.getElementById('newPlanBtn').addEventListener('click', openModal);
+
+    document.getElementById('modal').addEventListener('click', e => {
+      if (e.target.id === 'modal') closeModal();
+    });
+
+    document.getElementById('planNameInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('createPlanBtn').click();
+    });
+
+    document.getElementById('createPlanBtn').addEventListener('click', () => {
+      const name = document.getElementById('planNameInput').value.trim();
+      if (!name) return;
+      const plan = { id: uid(), name, nodes: [] };
+      state.plans.unshift(plan);
+      save();
+      closeModal();
+      showDetail(plan.id);
+    });
+
+    function openModal() {
+      document.getElementById('modal').classList.remove('hidden');
+      document.getElementById('planNameInput').value = '';
+      setTimeout(() => document.getElementById('planNameInput').focus(), 80);
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
+
+    /* ── "+ Add Node" ── */
+    document.getElementById('addNodeBtn').addEventListener('click', () => {
+      const plan = state.plans.find(p => p.id === currentPlanId);
+      const node = { id: uid(), title: '', desc: '' };
+      plan.nodes.push(node);
+      save();
+      const list = document.getElementById('nodeList');
+      if (plan.nodes.length > 1) {
+        list.appendChild(buildConnector(plan.nodes.length - 1));
+      }
+      const card = buildNodeCard(node);
+      list.appendChild(card);
+      card.querySelector('.node-title-input').focus();
+    });
+
+    /* ── Back ── */
+    document.getElementById('backBtn').addEventListener('click', showList);
+
+    /* ── Init ── */
+    showList();
+  </script>
+</body>
+</html>
