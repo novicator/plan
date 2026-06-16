@@ -399,16 +399,19 @@
 
     .node-modal-desc-input::placeholder { color: rgba(255,255,255,0.2); }
 
-    /* ── Modal (bottom sheet) ── */
-    .modal-overlay {
+    /* ── Modals (native <dialog>) ── */
+    dialog {
       position: fixed;
       inset: 0;
+      margin: auto;
+      border: none;
+      padding: 0;
+      background: transparent;
+      max-width: calc(100vw - 48px);
+    }
+
+    dialog::backdrop {
       background: rgba(0,0,0,0.65);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      padding: 24px;
     }
 
     .modal-sheet {
@@ -494,60 +497,54 @@
   </div>
 
   <!-- ── MODAL: name the plan ── -->
-  <div id="modal" class="modal-overlay hidden">
-    <div class="modal-sheet">
-      <div class="modal-label">New Plan</div>
-      <input
-        class="modal-input"
-        id="planNameInput"
-        type="text"
-        placeholder="e.g. Cybersecurity job hunt"
-        maxlength="80"
-        autocomplete="off"
-        autocorrect="off"
-      >
-      <button class="primary-btn modal-create-btn" id="createPlanBtn">Create Plan</button>
-    </div>
-  </div>
+  <dialog id="modal" class="modal-sheet">
+    <div class="modal-label">New Plan</div>
+    <input
+      class="modal-input"
+      id="planNameInput"
+      type="text"
+      placeholder="e.g. Cybersecurity job hunt"
+      maxlength="80"
+      autocomplete="off"
+      autocorrect="off"
+      autofocus
+    >
+    <button class="primary-btn modal-create-btn" id="createPlanBtn" type="button">Create Plan</button>
+  </dialog>
 
   <!-- ── MODAL: name the node ── -->
-  <div id="addNodeModal" class="modal-overlay hidden">
-    <div class="modal-sheet">
-      <div class="modal-label">New Node</div>
-      <input
-        class="modal-input"
-        id="nodeNameInput"
-        type="text"
-        placeholder="e.g. Security+ Certificate"
-        maxlength="120"
-        autocomplete="off"
-        autocorrect="off"
-      >
-      <button class="primary-btn modal-create-btn" id="createNodeBtn">Add Node</button>
-    </div>
-  </div>
+  <dialog id="addNodeModal" class="modal-sheet">
+    <div class="modal-label">New Node</div>
+    <input
+      class="modal-input"
+      id="nodeNameInput"
+      type="text"
+      placeholder="e.g. Security+ Certificate"
+      maxlength="120"
+      autocomplete="off"
+      autocorrect="off"
+      autofocus
+    >
+    <button class="primary-btn modal-create-btn" id="createNodeBtn" type="button">Add Node</button>
+  </dialog>
 
   <!-- ── MODAL: node detail ── -->
-  <div id="nodeModal" class="modal-overlay hidden">
-    <div class="node-modal">
-      <div class="node-modal-header">
-        <input class="node-modal-title-input" id="nodeModalTitle" type="text" placeholder="Title" maxlength="120" autocomplete="off" autocorrect="off">
-        <button class="node-modal-close" id="nodeModalCloseBtn" title="Close">✕</button>
-      </div>
-      <textarea class="node-modal-desc-input" id="nodeModalDesc" placeholder="Description..."></textarea>
+  <dialog id="nodeModal" class="node-modal">
+    <div class="node-modal-header">
+      <input class="node-modal-title-input" id="nodeModalTitle" type="text" placeholder="Title" maxlength="120" autocomplete="off" autocorrect="off">
+      <button class="node-modal-close" id="nodeModalCloseBtn" title="Close" type="button">✕</button>
     </div>
-  </div>
+    <textarea class="node-modal-desc-input" id="nodeModalDesc" placeholder="Description..."></textarea>
+  </dialog>
 
   <!-- ── MODAL: confirm delete ── -->
-  <div id="confirmModal" class="modal-overlay hidden">
-    <div class="modal-sheet">
-      <div class="modal-label" id="confirmModalLabel">Delete this node?</div>
-      <div style="display:flex; gap:10px;">
-        <button class="primary-btn" id="confirmCancelBtn" style="flex:1; width:auto; background:#3a1010; box-shadow:none; font-size:16px; padding:14px 8px;">Cancel</button>
-        <button class="primary-btn" id="confirmDeleteBtn" style="flex:1; width:auto; font-size:16px; padding:14px 8px;">Delete</button>
-      </div>
+  <dialog id="confirmModal" class="modal-sheet">
+    <div class="modal-label" id="confirmModalLabel">Delete this node?</div>
+    <div style="display:flex; gap:10px;">
+      <button class="primary-btn" id="confirmCancelBtn" type="button" style="flex:1; width:auto; background:#3a1010; box-shadow:none; font-size:16px; padding:14px 8px;">Cancel</button>
+      <button class="primary-btn" id="confirmDeleteBtn" type="button" style="flex:1; width:auto; font-size:16px; padding:14px 8px;">Delete</button>
     </div>
-  </div>
+  </dialog>
 
   <script>
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
@@ -611,13 +608,6 @@
 
     function uid() {
       return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    }
-
-    /* iOS WebKit sometimes freezes the repaint right after a text input's
-       keyboard dismisses mid-transition; blur first and force a layout pass. */
-    function settleKeyboardThenRepaint() {
-      if (document.activeElement) document.activeElement.blur();
-      void document.body.offsetHeight;
     }
 
     function esc(str) {
@@ -737,24 +727,24 @@
     function deleteNode(nodeId) {
       pendingDelete = { type: 'node', id: nodeId };
       document.getElementById('confirmModalLabel').textContent = 'Delete this node?';
-      document.getElementById('confirmModal').classList.remove('hidden');
+      document.getElementById('confirmModal').showModal();
     }
 
     function deletePlan(planId) {
       pendingDelete = { type: 'plan', id: planId };
       document.getElementById('confirmModalLabel').textContent = 'Delete this plan?';
-      document.getElementById('confirmModal').classList.remove('hidden');
+      document.getElementById('confirmModal').showModal();
     }
 
     document.getElementById('confirmCancelBtn').addEventListener('click', () => {
       pendingDelete = null;
-      document.getElementById('confirmModal').classList.add('hidden');
+      document.getElementById('confirmModal').close();
     });
 
     document.getElementById('confirmModal').addEventListener('click', e => {
       if (e.target.id === 'confirmModal') {
         pendingDelete = null;
-        document.getElementById('confirmModal').classList.add('hidden');
+        document.getElementById('confirmModal').close();
       }
     });
 
@@ -772,7 +762,7 @@
         renderPlans();
       }
       pendingDelete = null;
-      document.getElementById('confirmModal').classList.add('hidden');
+      document.getElementById('confirmModal').close();
     });
 
     /* ── Node detail modal ── */
@@ -782,12 +772,11 @@
       activeNode = node;
       document.getElementById('nodeModalTitle').value = node.title;
       document.getElementById('nodeModalDesc').value = node.desc;
-      document.getElementById('nodeModal').classList.remove('hidden');
+      document.getElementById('nodeModal').showModal();
     }
 
     function closeNodeModal() {
-      settleKeyboardThenRepaint();
-      document.getElementById('nodeModal').classList.add('hidden');
+      document.getElementById('nodeModal').close();
       activeNode = null;
       renderNodes();
     }
@@ -900,30 +889,27 @@
       const plan = { id: uid(), name, nodes: [] };
       state.plans.unshift(plan);
       save();
-      settleKeyboardThenRepaint();
       closeModal();
       showDetail(plan.id);
     });
 
     function openModal() {
-      document.getElementById('modal').classList.remove('hidden');
       document.getElementById('planNameInput').value = '';
-      setTimeout(() => document.getElementById('planNameInput').focus(), 80);
+      document.getElementById('modal').showModal();
     }
 
     function closeModal() {
-      document.getElementById('modal').classList.add('hidden');
+      document.getElementById('modal').close();
     }
 
     /* ── "+ Add Node" ── */
     document.getElementById('addNodeBtn').addEventListener('click', () => {
-      document.getElementById('addNodeModal').classList.remove('hidden');
       document.getElementById('nodeNameInput').value = '';
-      setTimeout(() => document.getElementById('nodeNameInput').focus(), 80);
+      document.getElementById('addNodeModal').showModal();
     });
 
     document.getElementById('addNodeModal').addEventListener('click', e => {
-      if (e.target.id === 'addNodeModal') document.getElementById('addNodeModal').classList.add('hidden');
+      if (e.target.id === 'addNodeModal') document.getElementById('addNodeModal').close();
     });
 
     document.getElementById('nodeNameInput').addEventListener('keydown', e => {
@@ -937,13 +923,12 @@
       const node = { id: uid(), title: name, desc: '' };
       plan.nodes.push(node);
       save();
-      settleKeyboardThenRepaint();
       const list = document.getElementById('nodeList');
       if (plan.nodes.length > 1) {
         list.appendChild(buildConnector(plan.nodes.length - 1));
       }
       list.appendChild(buildNodeCard(node));
-      document.getElementById('addNodeModal').classList.add('hidden');
+      document.getElementById('addNodeModal').close();
     });
 
     /* ── Back ── */
@@ -959,7 +944,7 @@
 
     function isBusy() {
       const openModal = ['modal', 'addNodeModal', 'nodeModal', 'confirmModal']
-        .some(id => !document.getElementById(id).classList.contains('hidden'));
+        .some(id => document.getElementById(id).open);
       const tag = document.activeElement && document.activeElement.tagName;
       return openModal || tag === 'INPUT' || tag === 'TEXTAREA' || dirty;
     }
