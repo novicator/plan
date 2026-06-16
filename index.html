@@ -33,7 +33,7 @@
 
     .hidden { display: none !important; }
 
-    /* ── Header ── */
+    /* ── Headers ── */
     .header {
       padding: 24px 24px 14px;
       text-align: center;
@@ -60,7 +60,6 @@
 
     .sync-indicator.visible { opacity: 1; }
 
-    /* ── Detail header ── */
     .detail-header {
       padding: 28px 24px 14px;
       display: flex;
@@ -140,7 +139,9 @@
       }
     }
 
-    /* ── Plan list items ── */
+    .small-btn { font-size: 17px; padding: 12px 24px; }
+
+    /* ── Plan list ── */
     .plan-list { display: flex; flex-direction: column; gap: 10px; }
 
     .plan-item {
@@ -169,8 +170,6 @@
       margin-top: 3px;
     }
 
-    .plan-item-arrow { color: #4a1515; font-size: 20px; }
-
     /* ── Empty state ── */
     .empty-state {
       flex: 1;
@@ -190,7 +189,7 @@
       text-align: center;
     }
 
-    /* ── Node connector ── */
+    /* ── Node connector (animated pulse line) ── */
     .node-list { display: flex; flex-direction: column; }
 
     .node-connector {
@@ -226,7 +225,6 @@
     }
 
     /* ── Node cards ── */
-
     .node-card {
       background: #160303;
       border: 1px solid #2d0808;
@@ -237,9 +235,7 @@
       cursor: pointer;
     }
 
-    .node-card.dragging {
-      opacity: 0.4;
-    }
+    .node-card.dragging { opacity: 0.4; }
 
     .node-card.drag-over {
       box-shadow: 0 0 0 2px #c0392b, 0 4px 20px rgba(192,57,43,0.4);
@@ -265,6 +261,33 @@
     }
 
     .node-drag-handle:active { cursor: grabbing; }
+
+    .node-title-display {
+      flex: 1;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .node-title-placeholder { color: rgba(255,255,255,0.35); font-weight: 600; }
+
+    .delete-x {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.45);
+      cursor: pointer;
+      padding: 4px;
+      flex-shrink: 0;
+      font-size: 20px;
+      line-height: 1;
+      border-radius: 50%;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+
+    .delete-x:hover { color: #fff; background: rgba(255,255,255,0.18); }
 
     /* floating ghost during drag */
     .drag-ghost {
@@ -297,34 +320,63 @@
       white-space: nowrap;
     }
 
-    .node-title-display {
-      flex: 1;
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .node-title-placeholder { color: rgba(255,255,255,0.35); font-weight: 600; }
-
-    .node-delete-btn {
-      background: none;
+    /* ── Dialogs (native <dialog>) ── */
+    dialog {
+      position: fixed;
+      inset: 0;
+      margin: auto;
       border: none;
-      color: rgba(255,255,255,0.45);
-      cursor: pointer;
-      padding: 4px;
-      flex-shrink: 0;
-      font-size: 20px;
-      line-height: 1;
-      border-radius: 50%;
-      transition: color 0.15s ease, background 0.15s ease;
+      padding: 0;
+      background: transparent;
+      max-width: calc(100vw - 48px);
     }
 
-    .node-delete-btn:hover { color: #fff; background: rgba(255,255,255,0.18); }
+    dialog::backdrop { background: rgba(0,0,0,0.65); }
 
-    /* ── Node modal (full content popup) ── */
+    .modal-sheet {
+      background: #1a0505;
+      border: 1px solid #2d0808;
+      border-radius: 24px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-label {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    .modal-input {
+      width: 100%;
+      background: #2a0808;
+      border: 1.5px solid #3d1010;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 17px;
+      font-family: inherit;
+      padding: 15px 16px;
+      outline: none;
+      caret-color: #c0392b;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .modal-input:focus { border-color: #c0392b; }
+    .modal-input::placeholder { color: #5a2020; }
+
+    .confirm-row { display: flex; gap: 10px; }
+
+    .confirm-row .primary-btn { flex: 1; width: auto; font-size: 16px; padding: 14px 8px; }
+
+    .cancel-btn { background: #3a1010 !important; box-shadow: none !important; }
+
+    /* ── Node detail dialog ── */
     .node-modal {
       background: #160303;
       border: 1px solid #2d0808;
@@ -398,63 +450,6 @@
     }
 
     .node-modal-desc-input::placeholder { color: rgba(255,255,255,0.2); }
-
-    /* ── Modals (native <dialog>) ── */
-    dialog {
-      position: fixed;
-      inset: 0;
-      margin: auto;
-      border: none;
-      padding: 0;
-      background: transparent;
-      max-width: calc(100vw - 48px);
-    }
-
-    dialog::backdrop {
-      background: rgba(0,0,0,0.65);
-    }
-
-    .modal-sheet {
-      background: #1a0505;
-      border: 1px solid #2d0808;
-      border-radius: 24px;
-      padding: 28px 24px;
-      width: 100%;
-      max-width: 420px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .modal-label {
-      font-size: 20px;
-      font-weight: 800;
-      color: #fff;
-      letter-spacing: -0.3px;
-    }
-
-    .modal-input {
-      width: 100%;
-      background: #2a0808;
-      border: 1.5px solid #3d1010;
-      border-radius: 14px;
-      color: #fff;
-      font-size: 17px;
-      font-family: inherit;
-      padding: 15px 16px;
-      outline: none;
-      caret-color: #c0392b;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-
-    .modal-input:focus { border-color: #c0392b; }
-    .modal-input::placeholder { color: #5a2020; }
-
-    .modal-create-btn {
-      font-size: 17px;
-      padding: 16px 24px;
-    }
   </style>
 </head>
 <body>
@@ -463,6 +458,7 @@
   <div id="listView" class="view">
     <div class="header">
       <h1>Plans</h1>
+      <div class="sync-indicator" id="syncIndicator"></div>
     </div>
     <div class="content">
       <button class="primary-btn" id="newPlanBtn">+ New Plan</button>
@@ -491,91 +487,92 @@
       <input class="detail-plan-name" id="detailTitle" type="text" maxlength="80" autocomplete="off" autocorrect="off">
     </div>
     <div class="content">
-      <button class="primary-btn" id="addNodeBtn" style="font-size:17px; padding:12px 24px;">+ Add Node</button>
+      <button class="primary-btn small-btn" id="addNodeBtn">+ Add Node</button>
       <div class="node-list" id="nodeList"></div>
     </div>
   </div>
 
-  <!-- ── MODAL: name the plan ── -->
-  <dialog id="modal" class="modal-sheet">
+  <!-- ── DIALOG: new plan ── -->
+  <dialog id="newPlanDialog" class="modal-sheet">
     <div class="modal-label">New Plan</div>
-    <input
-      class="modal-input"
-      id="planNameInput"
-      type="text"
-      placeholder="e.g. Cybersecurity job hunt"
-      maxlength="80"
-      autocomplete="off"
-      autocorrect="off"
-      autofocus
-    >
-    <button class="primary-btn modal-create-btn" id="createPlanBtn" type="button">Create Plan</button>
+    <input class="modal-input" id="planNameInput" type="text" placeholder="e.g. Cybersecurity job hunt" maxlength="80" autocomplete="off" autocorrect="off" autofocus>
+    <button class="primary-btn small-btn" id="createPlanBtn" type="button">Create Plan</button>
   </dialog>
 
-  <!-- ── MODAL: name the node ── -->
-  <dialog id="addNodeModal" class="modal-sheet">
+  <!-- ── DIALOG: new node ── -->
+  <dialog id="newNodeDialog" class="modal-sheet">
     <div class="modal-label">New Node</div>
-    <input
-      class="modal-input"
-      id="nodeNameInput"
-      type="text"
-      placeholder="e.g. Security+ Certificate"
-      maxlength="120"
-      autocomplete="off"
-      autocorrect="off"
-      autofocus
-    >
-    <button class="primary-btn modal-create-btn" id="createNodeBtn" type="button">Add Node</button>
+    <input class="modal-input" id="nodeNameInput" type="text" placeholder="e.g. Security+ Certificate" maxlength="120" autocomplete="off" autocorrect="off" autofocus>
+    <button class="primary-btn small-btn" id="createNodeBtn" type="button">Add Node</button>
   </dialog>
 
-  <!-- ── MODAL: node detail ── -->
-  <dialog id="nodeModal" class="node-modal">
+  <!-- ── DIALOG: node detail (title + description) ── -->
+  <dialog id="nodeDetailDialog" class="node-modal">
     <div class="node-modal-header">
-      <input class="node-modal-title-input" id="nodeModalTitle" type="text" placeholder="Title" maxlength="120" autocomplete="off" autocorrect="off">
-      <button class="node-modal-close" id="nodeModalCloseBtn" title="Close" type="button">✕</button>
+      <input class="node-modal-title-input" id="nodeDetailTitle" type="text" placeholder="Title" maxlength="120" autocomplete="off" autocorrect="off">
+      <button class="node-modal-close" id="nodeDetailCloseBtn" title="Close" type="button">✕</button>
     </div>
-    <textarea class="node-modal-desc-input" id="nodeModalDesc" placeholder="Description..."></textarea>
+    <textarea class="node-modal-desc-input" id="nodeDetailDesc" placeholder="Description..."></textarea>
   </dialog>
 
-  <!-- ── MODAL: confirm delete ── -->
-  <dialog id="confirmModal" class="modal-sheet">
-    <div class="modal-label" id="confirmModalLabel">Delete this node?</div>
-    <div style="display:flex; gap:10px;">
-      <button class="primary-btn" id="confirmCancelBtn" type="button" style="flex:1; width:auto; background:#3a1010; box-shadow:none; font-size:16px; padding:14px 8px;">Cancel</button>
-      <button class="primary-btn" id="confirmDeleteBtn" type="button" style="flex:1; width:auto; font-size:16px; padding:14px 8px;">Delete</button>
+  <!-- ── DIALOG: confirm delete (shared by node + plan) ── -->
+  <dialog id="confirmDialog" class="modal-sheet">
+    <div class="modal-label" id="confirmLabel">Delete this?</div>
+    <div class="confirm-row">
+      <button class="primary-btn cancel-btn" id="confirmCancelBtn" type="button">Cancel</button>
+      <button class="primary-btn" id="confirmOkBtn" type="button">Delete</button>
     </div>
   </dialog>
 
   <script>
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+    /* ── Purge any previously installed service worker / cache ──
+       This app no longer uses a service worker. If an old one is
+       still controlling this page from a prior version, kill it so
+       it can never serve stale content again. */
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(reg => reg.unregister());
+      });
+    }
+    if ('caches' in window) {
+      caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+    }
 
     /* ── State ── */
     const SYNC_URL = 'https://jsonblob.com/api/jsonBlob/019ed062-a246-7fed-97ad-ded887e3fd24';
-    let state = JSON.parse(localStorage.getItem('plans-data') || '{"plans":[]}');
+    const STORAGE_KEY = 'plans-data';
+    const VIEW_KEY = 'current-plan-id';
+
+    let state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{"plans":[]}');
     let currentPlanId = null;
+    let dirty = false;
     let syncTimer = null;
 
-    let dirty = false;
+    function uid() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    }
+
+    function esc(str) {
+      return (str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
 
     function save() {
-      localStorage.setItem('plans-data', JSON.stringify(state));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       dirty = true;
-      scheduleSync();
+      clearTimeout(syncTimer);
+      setSyncStatus('Syncing…');
+      syncTimer = setTimeout(pushToCloud, 700);
     }
 
     function setSyncStatus(text) {
       const el = document.getElementById('syncIndicator');
       el.textContent = text;
       el.classList.add('visible');
-      if (text === 'Synced') {
-        setTimeout(() => el.classList.remove('visible'), 1200);
-      }
-    }
-
-    function scheduleSync() {
-      clearTimeout(syncTimer);
-      setSyncStatus('Syncing…');
-      syncTimer = setTimeout(pushToCloud, 700);
+      if (text === 'Synced') setTimeout(() => el.classList.remove('visible'), 1200);
     }
 
     async function pushToCloud() {
@@ -592,66 +589,64 @@
       }
     }
 
-    async function loadFromCloud() {
+    async function pullFromCloud() {
       try {
         const res = await fetch(SYNC_URL);
         if (!res.ok) throw new Error('bad response');
         const data = await res.json();
         if (data && Array.isArray(data.plans)) {
           state = data;
-          localStorage.setItem('plans-data', JSON.stringify(state));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
       } catch {
-        // offline — fall back to whatever's already in localStorage
+        // offline — keep whatever's already in localStorage
       }
     }
 
-    function uid() {
-      return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    }
-
-    function esc(str) {
-      return (str || '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
-
-    /* ── View switching ── */
-    const $list   = document.getElementById('listView');
-    const $detail = document.getElementById('detailView');
+    /* ── View elements ── */
+    const $listView   = document.getElementById('listView');
+    const $detailView = document.getElementById('detailView');
+    const $planList    = document.getElementById('planList');
+    const $emptyState  = document.getElementById('emptyState');
+    const $nodeList     = document.getElementById('nodeList');
+    const $detailTitle  = document.getElementById('detailTitle');
 
     function showList() {
       currentPlanId = null;
-      localStorage.removeItem('current-plan-id');
-      $detail.classList.add('hidden');
-      $list.classList.remove('hidden');
+      localStorage.removeItem(VIEW_KEY);
+      $detailView.classList.add('hidden');
+      $listView.classList.remove('hidden');
       renderPlans();
     }
 
     function showDetail(planId) {
-      currentPlanId = planId;
-      localStorage.setItem('current-plan-id', planId);
-      $list.classList.add('hidden');
-      $detail.classList.remove('hidden');
       const plan = state.plans.find(p => p.id === planId);
-      const titleEl = document.getElementById('detailTitle');
-      titleEl.value = plan.name;
-      titleEl.oninput = () => { plan.name = titleEl.value; save(); renderPlans(); };
+      if (!plan) { showList(); return; }
+      currentPlanId = planId;
+      localStorage.setItem(VIEW_KEY, planId);
+      $listView.classList.add('hidden');
+      $detailView.classList.remove('hidden');
+      $detailTitle.value = plan.name;
       renderNodes();
     }
 
-    /* ── Render plans ── */
+    $detailTitle.addEventListener('input', () => {
+      const plan = state.plans.find(p => p.id === currentPlanId);
+      if (!plan) return;
+      plan.name = $detailTitle.value;
+      save();
+    });
+
+    document.getElementById('backBtn').addEventListener('click', showList);
+
+    /* ── Render: plan list ── */
     function renderPlans() {
-      const list  = document.getElementById('planList');
-      const empty = document.getElementById('emptyState');
-      list.innerHTML = '';
+      $planList.innerHTML = '';
       if (state.plans.length === 0) {
-        empty.classList.remove('hidden');
+        $emptyState.classList.remove('hidden');
         return;
       }
-      empty.classList.add('hidden');
+      $emptyState.classList.add('hidden');
       state.plans.forEach(plan => {
         const n = plan.nodes.length;
         const item = document.createElement('div');
@@ -661,29 +656,32 @@
             <div class="plan-item-name">${esc(plan.name)}</div>
             <div class="plan-item-meta">${n} ${n === 1 ? 'node' : 'nodes'}</div>
           </div>
-          <button class="node-delete-btn plan-delete-btn" title="Delete plan">✕</button>
+          <button class="delete-x" title="Delete plan" type="button">✕</button>
         `;
         item.addEventListener('click', e => {
-          if (e.target.closest('.plan-delete-btn')) return;
+          if (e.target.closest('.delete-x')) return;
           showDetail(plan.id);
         });
-        item.querySelector('.plan-delete-btn').addEventListener('click', e => {
+        item.querySelector('.delete-x').addEventListener('click', e => {
           e.stopPropagation();
-          deletePlan(plan.id);
+          confirmDelete('Delete this plan?', () => {
+            state.plans = state.plans.filter(p => p.id !== plan.id);
+            save();
+            renderPlans();
+          });
         });
-        list.appendChild(item);
+        $planList.appendChild(item);
       });
     }
 
-    /* ── Render nodes ── */
+    /* ── Render: node list ── */
     function renderNodes() {
-      const list = document.getElementById('nodeList');
-      list.innerHTML = '';
+      $nodeList.innerHTML = '';
       const plan = state.plans.find(p => p.id === currentPlanId);
       if (!plan) return;
       plan.nodes.forEach((node, i) => {
-        if (i > 0) list.appendChild(buildConnector(i));
-        list.appendChild(buildNodeCard(node));
+        if (i > 0) $nodeList.appendChild(buildConnector(i));
+        $nodeList.appendChild(buildNodeCard(node));
       });
     }
 
@@ -697,6 +695,7 @@
     function buildNodeCard(node) {
       const card = document.createElement('div');
       card.className = 'node-card';
+      card.dataset.nodeId = node.id;
       const titleHtml = node.title
         ? esc(node.title)
         : '<span class="node-title-placeholder">Untitled</span>';
@@ -704,106 +703,156 @@
         <div class="node-title-row">
           <span class="node-drag-handle" title="Drag to reorder">⠿</span>
           <span class="node-title-display">${titleHtml}</span>
-          <button class="node-delete-btn" title="Delete node">✕</button>
+          <button class="delete-x" title="Delete node" type="button">✕</button>
         </div>
       `;
 
       card.addEventListener('click', e => {
-        if (e.target.closest('.node-drag-handle, .node-delete-btn')) return;
-        openNodeModal(node);
+        if (e.target.closest('.node-drag-handle, .delete-x')) return;
+        openNodeDetail(node);
       });
 
-      card.querySelector('.node-delete-btn').addEventListener('click', e => {
+      card.querySelector('.delete-x').addEventListener('click', e => {
         e.stopPropagation();
-        deleteNode(node.id);
+        confirmDelete('Delete this node?', () => {
+          const plan = state.plans.find(p => p.id === currentPlanId);
+          if (!plan) return;
+          plan.nodes = plan.nodes.filter(n => n.id !== node.id);
+          save();
+          renderNodes();
+        });
       });
 
       initDrag(card, node);
       return card;
     }
 
-    let pendingDelete = null;
+    /* ── Confirm-delete dialog (shared) ── */
+    const $confirmDialog = document.getElementById('confirmDialog');
+    let confirmAction = null;
 
-    function deleteNode(nodeId) {
-      pendingDelete = { type: 'node', id: nodeId };
-      document.getElementById('confirmModalLabel').textContent = 'Delete this node?';
-      document.getElementById('confirmModal').showModal();
-    }
-
-    function deletePlan(planId) {
-      pendingDelete = { type: 'plan', id: planId };
-      document.getElementById('confirmModalLabel').textContent = 'Delete this plan?';
-      document.getElementById('confirmModal').showModal();
+    function confirmDelete(label, onConfirm) {
+      document.getElementById('confirmLabel').textContent = label;
+      confirmAction = onConfirm;
+      $confirmDialog.showModal();
     }
 
     document.getElementById('confirmCancelBtn').addEventListener('click', () => {
-      pendingDelete = null;
-      document.getElementById('confirmModal').close();
+      confirmAction = null;
+      $confirmDialog.close();
     });
 
-    document.getElementById('confirmModal').addEventListener('click', e => {
-      if (e.target.id === 'confirmModal') {
-        pendingDelete = null;
-        document.getElementById('confirmModal').close();
+    $confirmDialog.addEventListener('click', e => {
+      if (e.target === $confirmDialog) {
+        confirmAction = null;
+        $confirmDialog.close();
       }
     });
 
-    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
-      if (pendingDelete && pendingDelete.type === 'node') {
-        const plan = state.plans.find(p => p.id === currentPlanId);
-        if (plan) {
-          plan.nodes = plan.nodes.filter(n => n.id !== pendingDelete.id);
-          save();
-          renderNodes();
-        }
-      } else if (pendingDelete && pendingDelete.type === 'plan') {
-        state.plans = state.plans.filter(p => p.id !== pendingDelete.id);
-        save();
-        renderPlans();
-      }
-      pendingDelete = null;
-      document.getElementById('confirmModal').close();
+    document.getElementById('confirmOkBtn').addEventListener('click', () => {
+      const action = confirmAction;
+      confirmAction = null;
+      $confirmDialog.close();
+      if (action) action();
     });
 
-    /* ── Node detail modal ── */
+    /* ── Node detail dialog ── */
+    const $nodeDetailDialog = document.getElementById('nodeDetailDialog');
+    const $nodeDetailTitle  = document.getElementById('nodeDetailTitle');
+    const $nodeDetailDesc   = document.getElementById('nodeDetailDesc');
     let activeNode = null;
 
-    function openNodeModal(node) {
+    function openNodeDetail(node) {
       activeNode = node;
-      document.getElementById('nodeModalTitle').value = node.title;
-      document.getElementById('nodeModalDesc').value = node.desc;
-      document.getElementById('nodeModal').showModal();
+      $nodeDetailTitle.value = node.title;
+      $nodeDetailDesc.value = node.desc;
+      $nodeDetailDialog.showModal();
     }
 
-    function closeNodeModal() {
-      document.getElementById('nodeModal').close();
+    function closeNodeDetail() {
+      $nodeDetailDialog.close();
       activeNode = null;
       renderNodes();
     }
 
-    document.getElementById('nodeModalTitle').addEventListener('input', e => {
+    $nodeDetailTitle.addEventListener('input', () => {
       if (!activeNode) return;
-      activeNode.title = e.target.value;
+      activeNode.title = $nodeDetailTitle.value;
       save();
     });
 
-    document.getElementById('nodeModalDesc').addEventListener('input', e => {
+    $nodeDetailDesc.addEventListener('input', () => {
       if (!activeNode) return;
-      activeNode.desc = e.target.value;
+      activeNode.desc = $nodeDetailDesc.value;
       save();
     });
 
-    document.getElementById('nodeModalCloseBtn').addEventListener('click', closeNodeModal);
+    document.getElementById('nodeDetailCloseBtn').addEventListener('click', closeNodeDetail);
 
-    document.getElementById('nodeModal').addEventListener('click', e => {
-      if (e.target.id === 'nodeModal') closeNodeModal();
+    $nodeDetailDialog.addEventListener('click', e => {
+      if (e.target === $nodeDetailDialog) closeNodeDetail();
     });
 
-    /* ── Drag to reorder ── */
+    /* ── New Plan dialog ── */
+    const $newPlanDialog  = document.getElementById('newPlanDialog');
+    const $planNameInput  = document.getElementById('planNameInput');
+
+    document.getElementById('newPlanBtn').addEventListener('click', () => {
+      $planNameInput.value = '';
+      $newPlanDialog.showModal();
+    });
+
+    $newPlanDialog.addEventListener('click', e => {
+      if (e.target === $newPlanDialog) $newPlanDialog.close();
+    });
+
+    $planNameInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('createPlanBtn').click();
+    });
+
+    document.getElementById('createPlanBtn').addEventListener('click', () => {
+      const name = $planNameInput.value.trim();
+      if (!name) return;
+      const plan = { id: uid(), name, nodes: [] };
+      state.plans.unshift(plan);
+      save();
+      $newPlanDialog.close();
+      showDetail(plan.id);
+    });
+
+    /* ── New Node dialog ── */
+    const $newNodeDialog  = document.getElementById('newNodeDialog');
+    const $nodeNameInput  = document.getElementById('nodeNameInput');
+
+    document.getElementById('addNodeBtn').addEventListener('click', () => {
+      $nodeNameInput.value = '';
+      $newNodeDialog.showModal();
+    });
+
+    $newNodeDialog.addEventListener('click', e => {
+      if (e.target === $newNodeDialog) $newNodeDialog.close();
+    });
+
+    $nodeNameInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('createNodeBtn').click();
+    });
+
+    document.getElementById('createNodeBtn').addEventListener('click', () => {
+      const name = $nodeNameInput.value.trim();
+      if (!name) return;
+      const plan = state.plans.find(p => p.id === currentPlanId);
+      if (!plan) return;
+      const node = { id: uid(), title: name, desc: '' };
+      plan.nodes.push(node);
+      save();
+      if (plan.nodes.length > 1) $nodeList.appendChild(buildConnector(plan.nodes.length - 1));
+      $nodeList.appendChild(buildNodeCard(node));
+      $newNodeDialog.close();
+    });
+
+    /* ── Drag to reorder nodes ── */
     function initDrag(card, node) {
       const handle = card.querySelector('.node-drag-handle');
-      card.dataset.nodeId = node.id;
-
       let ghost = null;
       let overCard = null;
       let offsetX = 0, offsetY = 0;
@@ -836,7 +885,6 @@
         ghost.style.left = (e.clientX - offsetX) + 'px';
         ghost.style.top  = (e.clientY - offsetY) + 'px';
 
-        // find card under pointer (hide ghost briefly so elementFromPoint works)
         ghost.style.visibility = 'hidden';
         const el = document.elementFromPoint(e.clientX, e.clientY);
         ghost.style.visibility = '';
@@ -856,13 +904,14 @@
           overCard.classList.remove('drag-over');
           const targetId = overCard.dataset.nodeId;
           overCard = null;
-          if (targetId) dropNode(node.id, targetId);
+          if (targetId) reorderNodes(node.id, targetId);
         }
       });
     }
 
-    function dropNode(srcId, targetId) {
+    function reorderNodes(srcId, targetId) {
       const plan = state.plans.find(p => p.id === currentPlanId);
+      if (!plan) return;
       const srcIdx = plan.nodes.findIndex(n => n.id === srcId);
       const tgtIdx = plan.nodes.findIndex(n => n.id === targetId);
       if (srcIdx === -1 || tgtIdx === -1) return;
@@ -872,102 +921,30 @@
       renderNodes();
     }
 
-    /* ── "+ New Plan" ── */
-    document.getElementById('newPlanBtn').addEventListener('click', openModal);
-
-    document.getElementById('modal').addEventListener('click', e => {
-      if (e.target.id === 'modal') closeModal();
-    });
-
-    document.getElementById('planNameInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') document.getElementById('createPlanBtn').click();
-    });
-
-    document.getElementById('createPlanBtn').addEventListener('click', () => {
-      const name = document.getElementById('planNameInput').value.trim();
-      if (!name) return;
-      const plan = { id: uid(), name, nodes: [] };
-      state.plans.unshift(plan);
-      save();
-      closeModal();
-      showDetail(plan.id);
-    });
-
-    function openModal() {
-      document.getElementById('planNameInput').value = '';
-      document.getElementById('modal').showModal();
-    }
-
-    function closeModal() {
-      document.getElementById('modal').close();
-    }
-
-    /* ── "+ Add Node" ── */
-    document.getElementById('addNodeBtn').addEventListener('click', () => {
-      document.getElementById('nodeNameInput').value = '';
-      document.getElementById('addNodeModal').showModal();
-    });
-
-    document.getElementById('addNodeModal').addEventListener('click', e => {
-      if (e.target.id === 'addNodeModal') document.getElementById('addNodeModal').close();
-    });
-
-    document.getElementById('nodeNameInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') document.getElementById('createNodeBtn').click();
-    });
-
-    document.getElementById('createNodeBtn').addEventListener('click', () => {
-      const name = document.getElementById('nodeNameInput').value.trim();
-      if (!name) return;
-      const plan = state.plans.find(p => p.id === currentPlanId);
-      const node = { id: uid(), title: name, desc: '' };
-      plan.nodes.push(node);
-      save();
-      const list = document.getElementById('nodeList');
-      if (plan.nodes.length > 1) {
-        list.appendChild(buildConnector(plan.nodes.length - 1));
-      }
-      list.appendChild(buildNodeCard(node));
-      document.getElementById('addNodeModal').close();
-    });
-
-    /* ── Back ── */
-    document.getElementById('backBtn').addEventListener('click', showList);
-
-    /* ── Init ── */
+    /* ── Keep things sane across iOS suspend/resume ──
+       iOS suspends (rather than reloads) a home-screen PWA when
+       backgrounded, so any dialog left open would otherwise still be
+       open — stacked over the rest of the UI — when the app resumes. */
     function closeAllDialogs() {
-      if (document.getElementById('modal').open) closeModal();
-      if (document.getElementById('addNodeModal').open) document.getElementById('addNodeModal').close();
-      if (document.getElementById('nodeModal').open) closeNodeModal();
-      if (document.getElementById('confirmModal').open) {
-        pendingDelete = null;
-        document.getElementById('confirmModal').close();
-      }
-    }
-
-    closeAllDialogs();
-
-    const savedPlanId = localStorage.getItem('current-plan-id');
-    if (savedPlanId && state.plans.some(p => p.id === savedPlanId)) {
-      showDetail(savedPlanId);
-    } else {
-      showList();
+      if ($newPlanDialog.open) $newPlanDialog.close();
+      if ($newNodeDialog.open) $newNodeDialog.close();
+      if ($nodeDetailDialog.open) { $nodeDetailDialog.close(); activeNode = null; }
+      if ($confirmDialog.open) { confirmAction = null; $confirmDialog.close(); }
     }
 
     function isBusy() {
-      const openModal = ['modal', 'addNodeModal', 'nodeModal', 'confirmModal']
-        .some(id => document.getElementById(id).open);
+      const dialogOpen = $newPlanDialog.open || $newNodeDialog.open || $nodeDetailDialog.open || $confirmDialog.open;
       const tag = document.activeElement && document.activeElement.tagName;
-      return openModal || tag === 'INPUT' || tag === 'TEXTAREA' || dirty;
+      return dialogOpen || tag === 'INPUT' || tag === 'TEXTAREA' || dirty;
     }
 
     async function refreshFromCloud() {
       if (isBusy()) return;
-      await loadFromCloud();
-      if (currentPlanId && !$detail.classList.contains('hidden')) {
+      await pullFromCloud();
+      if (currentPlanId && !$detailView.classList.contains('hidden')) {
         const plan = state.plans.find(p => p.id === currentPlanId);
         if (plan) {
-          document.getElementById('detailTitle').value = plan.name;
+          $detailTitle.value = plan.name;
           renderNodes();
         } else {
           showList();
@@ -975,6 +952,16 @@
       } else {
         renderPlans();
       }
+    }
+
+    /* ── Init ── */
+    closeAllDialogs();
+
+    const savedPlanId = localStorage.getItem(VIEW_KEY);
+    if (savedPlanId && state.plans.some(p => p.id === savedPlanId)) {
+      showDetail(savedPlanId);
+    } else {
+      showList();
     }
 
     refreshFromCloud();
