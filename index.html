@@ -935,6 +935,18 @@
     document.getElementById('backBtn').addEventListener('click', showList);
 
     /* ── Init ── */
+    function closeAllDialogs() {
+      if (document.getElementById('modal').open) closeModal();
+      if (document.getElementById('addNodeModal').open) document.getElementById('addNodeModal').close();
+      if (document.getElementById('nodeModal').open) closeNodeModal();
+      if (document.getElementById('confirmModal').open) {
+        pendingDelete = null;
+        document.getElementById('confirmModal').close();
+      }
+    }
+
+    closeAllDialogs();
+
     const savedPlanId = localStorage.getItem('current-plan-id');
     if (savedPlanId && state.plans.some(p => p.id === savedPlanId)) {
       showDetail(savedPlanId);
@@ -968,7 +980,10 @@
     refreshFromCloud();
 
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') refreshFromCloud();
+      if (document.visibilityState === 'visible') {
+        closeAllDialogs();
+        refreshFromCloud();
+      }
     });
 
     setInterval(() => {
