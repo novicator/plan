@@ -541,7 +541,7 @@
   <!-- ── MODAL: confirm delete ── -->
   <div id="confirmModal" class="modal-overlay hidden">
     <div class="modal-sheet">
-      <div class="modal-label">Delete this node?</div>
+      <div class="modal-label" id="confirmModalLabel">Delete this node?</div>
       <div style="display:flex; gap:10px;">
         <button class="primary-btn" id="confirmCancelBtn" style="flex:1; width:auto; background:#3a1010; box-shadow:none; font-size:16px; padding:14px 8px;">Cancel</button>
         <button class="primary-btn" id="confirmDeleteBtn" style="flex:1; width:auto; font-size:16px; padding:14px 8px;">Delete</button>
@@ -613,6 +613,13 @@
       return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     }
 
+    /* iOS WebKit sometimes freezes the repaint right after a text input's
+       keyboard dismisses mid-transition; blur first and force a layout pass. */
+    function settleKeyboardThenRepaint() {
+      if (document.activeElement) document.activeElement.blur();
+      void document.body.offsetHeight;
+    }
+
     function esc(str) {
       return (str || '')
         .replace(/&/g, '&amp;')
@@ -664,9 +671,16 @@
             <div class="plan-item-name">${esc(plan.name)}</div>
             <div class="plan-item-meta">${n} ${n === 1 ? 'node' : 'nodes'}</div>
           </div>
-          <span class="plan-item-arrow">›</span>
+          <button class="node-delete-btn plan-delete-btn" title="Delete plan">✕</button>
         `;
-        item.addEventListener('click', () => showDetail(plan.id));
+        item.addEventListener('click', e => {
+          if (e.target.closest('.plan-delete-btn')) return;
+          showDetail(plan.id);
+        });
+        item.querySelector('.plan-delete-btn').addEventListener('click', e => {
+          e.stopPropagation();
+          deletePlan(plan.id);
+        });
         list.appendChild(item);
       });
     }
@@ -718,33 +732,46 @@
       return card;
     }
 
-    let pendingDeleteId = null;
+    let pendingDelete = null;
 
     function deleteNode(nodeId) {
-      pendingDeleteId = nodeId;
+      pendingDelete = { type: 'node', id: nodeId };
+      document.getElementById('confirmModalLabel').textContent = 'Delete this node?';
+      document.getElementById('confirmModal').classList.remove('hidden');
+    }
+
+    function deletePlan(planId) {
+      pendingDelete = { type: 'plan', id: planId };
+      document.getElementById('confirmModalLabel').textContent = 'Delete this plan?';
       document.getElementById('confirmModal').classList.remove('hidden');
     }
 
     document.getElementById('confirmCancelBtn').addEventListener('click', () => {
-      pendingDeleteId = null;
+      pendingDelete = null;
       document.getElementById('confirmModal').classList.add('hidden');
     });
 
     document.getElementById('confirmModal').addEventListener('click', e => {
       if (e.target.id === 'confirmModal') {
-        pendingDeleteId = null;
+        pendingDelete = null;
         document.getElementById('confirmModal').classList.add('hidden');
       }
     });
 
     document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
-      const plan = state.plans.find(p => p.id === currentPlanId);
-      if (plan && pendingDeleteId) {
-        plan.nodes = plan.nodes.filter(n => n.id !== pendingDeleteId);
+      if (pendingDelete && pendingDelete.type === 'node') {
+        const plan = state.plans.find(p => p.id === currentPlanId);
+        if (plan) {
+          plan.nodes = plan.nodes.filter(n => n.id !== pendingDelete.id);
+          save();
+          renderNodes();
+        }
+      } else if (pendingDelete && pendingDelete.type === 'plan') {
+        state.plans = state.plans.filter(p => p.id !== pendingDelete.id);
         save();
-        renderNodes();
+        renderPlans();
       }
-      pendingDeleteId = null;
+      pendingDelete = null;
       document.getElementById('confirmModal').classList.add('hidden');
     });
 
@@ -759,6 +786,7 @@
     }
 
     function closeNodeModal() {
+      settleKeyboardThenRepaint();
       document.getElementById('nodeModal').classList.add('hidden');
       activeNode = null;
       renderNodes();
@@ -872,6 +900,7 @@
       const plan = { id: uid(), name, nodes: [] };
       state.plans.unshift(plan);
       save();
+      settleKeyboardThenRepaint();
       closeModal();
       showDetail(plan.id);
     });
@@ -908,6 +937,7 @@
       const node = { id: uid(), title: name, desc: '' };
       plan.nodes.push(node);
       save();
+      settleKeyboardThenRepaint();
       const list = document.getElementById('nodeList');
       if (plan.nodes.length > 1) {
         list.appendChild(buildConnector(plan.nodes.length - 1));
