@@ -35,7 +35,7 @@
 
     /* ── Header ── */
     .header {
-      padding: 44px 24px 8px;
+      padding: 24px 24px 14px;
       text-align: center;
     }
 
@@ -47,9 +47,22 @@
       line-height: 1;
     }
 
+    .sync-indicator {
+      font-size: 12px;
+      color: #6a2020;
+      font-weight: 600;
+      margin-top: 8px;
+      letter-spacing: 0.3px;
+      height: 16px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .sync-indicator.visible { opacity: 1; }
+
     /* ── Detail header ── */
     .detail-header {
-      padding: 28px 24px 6px;
+      padding: 28px 24px 14px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -90,7 +103,7 @@
     /* ── Content ── */
     .content {
       flex: 1;
-      padding: 16px 24px 40px;
+      padding: 0px 24px 40px;
       display: flex;
       flex-direction: column;
       gap: 14px;
@@ -132,7 +145,7 @@
 
     .plan-item {
       background: #1a0505;
-      border: 1px solid #2d0808;
+      border: 1px solid #7a2424;
       border-radius: 16px;
       padding: 18px 20px;
       display: flex;
@@ -152,7 +165,7 @@
 
     .plan-item-meta {
       font-size: 13px;
-      color: #6a2020;
+      color: #c97a7a;
       margin-top: 3px;
     }
 
@@ -221,7 +234,7 @@
       overflow: hidden;
       box-shadow: 0 2px 12px rgba(0,0,0,0.4);
       transition: opacity 0.15s ease, box-shadow 0.15s ease;
-      touch-action: none;
+      cursor: pointer;
     }
 
     .node-card.dragging {
@@ -284,31 +297,64 @@
       white-space: nowrap;
     }
 
-    .node-collapse-btn {
-      background: none;
-      border: none;
-      color: rgba(255,255,255,0.5);
-      cursor: pointer;
-      padding: 0;
-      flex-shrink: 0;
-      font-size: 18px;
-      line-height: 1;
-      transition: transform 0.2s ease, color 0.15s ease;
+    .node-title-display {
+      flex: 1;
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .node-collapse-btn:hover { color: rgba(255,255,255,0.85); }
+    .node-title-placeholder { color: rgba(255,255,255,0.35); font-weight: 600; }
 
-    .node-card.collapsed .node-collapse-btn { transform: rotate(-90deg); }
+    .node-delete-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.45);
+      cursor: pointer;
+      padding: 4px;
+      flex-shrink: 0;
+      font-size: 20px;
+      line-height: 1;
+      border-radius: 50%;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
 
-    .node-card.collapsed .node-desc-row { display: none; }
+    .node-delete-btn:hover { color: #fff; background: rgba(255,255,255,0.18); }
 
-    .node-title-input {
+    /* ── Node modal (full content popup) ── */
+    .node-modal {
+      background: #160303;
+      border: 1px solid #2d0808;
+      border-radius: 20px;
       width: 100%;
+      max-width: 440px;
+      height: 85dvh;
+      max-height: 85dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.65);
+    }
+
+    .node-modal-header {
+      background: #7a1f1f;
+      padding: 8px 12px 8px 18px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .node-modal-title-input {
+      flex: 1;
       background: transparent;
       border: none;
       outline: none;
       color: #fff;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 700;
       font-family: inherit;
       caret-color: #ffaaaa;
@@ -316,30 +362,42 @@
       appearance: none;
     }
 
-    .node-title-input::placeholder { color: rgba(255,255,255,0.3); }
+    .node-modal-title-input::placeholder { color: rgba(255,255,255,0.3); }
 
-    .node-desc-row {
-      padding: 13px 16px;
+    .node-modal-close {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.65);
+      cursor: pointer;
+      font-size: 22px;
+      flex-shrink: 0;
+      padding: 6px;
+      border-radius: 50%;
+      transition: color 0.15s ease, background 0.15s ease;
     }
 
-    .node-desc-input {
+    .node-modal-close:hover { color: #fff; background: rgba(255,255,255,0.18); }
+
+    .node-modal-desc-input {
+      flex: 1;
       width: 100%;
       background: transparent;
       border: none;
       outline: none;
-      color: #c9a0a0;
+      color: #ddb0b0;
       font-size: 15px;
       font-family: inherit;
-      line-height: 1.55;
+      line-height: 1.6;
+      padding: 18px;
       resize: none;
-      min-height: 56px;
+      min-height: 200px;
       caret-color: #fff;
+      overflow-y: auto;
       -webkit-appearance: none;
       appearance: none;
-      overflow: hidden;
     }
 
-    .node-desc-input::placeholder { color: rgba(255,255,255,0.18); }
+    .node-modal-desc-input::placeholder { color: rgba(255,255,255,0.2); }
 
     /* ── Modal (bottom sheet) ── */
     .modal-overlay {
@@ -452,15 +510,103 @@
     </div>
   </div>
 
+  <!-- ── MODAL: name the node ── -->
+  <div id="addNodeModal" class="modal-overlay hidden">
+    <div class="modal-sheet">
+      <div class="modal-label">New Node</div>
+      <input
+        class="modal-input"
+        id="nodeNameInput"
+        type="text"
+        placeholder="e.g. Security+ Certificate"
+        maxlength="120"
+        autocomplete="off"
+        autocorrect="off"
+      >
+      <button class="primary-btn modal-create-btn" id="createNodeBtn">Add Node</button>
+    </div>
+  </div>
+
+  <!-- ── MODAL: node detail ── -->
+  <div id="nodeModal" class="modal-overlay hidden">
+    <div class="node-modal">
+      <div class="node-modal-header">
+        <input class="node-modal-title-input" id="nodeModalTitle" type="text" placeholder="Title" maxlength="120" autocomplete="off" autocorrect="off">
+        <button class="node-modal-close" id="nodeModalCloseBtn" title="Close">✕</button>
+      </div>
+      <textarea class="node-modal-desc-input" id="nodeModalDesc" placeholder="Description..."></textarea>
+    </div>
+  </div>
+
+  <!-- ── MODAL: confirm delete ── -->
+  <div id="confirmModal" class="modal-overlay hidden">
+    <div class="modal-sheet">
+      <div class="modal-label">Delete this node?</div>
+      <div style="display:flex; gap:10px;">
+        <button class="primary-btn" id="confirmCancelBtn" style="flex:1; width:auto; background:#3a1010; box-shadow:none; font-size:16px; padding:14px 8px;">Cancel</button>
+        <button class="primary-btn" id="confirmDeleteBtn" style="flex:1; width:auto; font-size:16px; padding:14px 8px;">Delete</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 
     /* ── State ── */
+    const SYNC_URL = 'https://jsonblob.com/api/jsonBlob/019ed062-a246-7fed-97ad-ded887e3fd24';
     let state = JSON.parse(localStorage.getItem('plans-data') || '{"plans":[]}');
     let currentPlanId = null;
+    let syncTimer = null;
+
+    let dirty = false;
 
     function save() {
       localStorage.setItem('plans-data', JSON.stringify(state));
+      dirty = true;
+      scheduleSync();
+    }
+
+    function setSyncStatus(text) {
+      const el = document.getElementById('syncIndicator');
+      el.textContent = text;
+      el.classList.add('visible');
+      if (text === 'Synced') {
+        setTimeout(() => el.classList.remove('visible'), 1200);
+      }
+    }
+
+    function scheduleSync() {
+      clearTimeout(syncTimer);
+      setSyncStatus('Syncing…');
+      syncTimer = setTimeout(pushToCloud, 700);
+    }
+
+    async function pushToCloud() {
+      try {
+        await fetch(SYNC_URL, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(state)
+        });
+        dirty = false;
+        setSyncStatus('Synced');
+      } catch {
+        document.getElementById('syncIndicator').classList.remove('visible');
+      }
+    }
+
+    async function loadFromCloud() {
+      try {
+        const res = await fetch(SYNC_URL);
+        if (!res.ok) throw new Error('bad response');
+        const data = await res.json();
+        if (data && Array.isArray(data.plans)) {
+          state = data;
+          localStorage.setItem('plans-data', JSON.stringify(state));
+        }
+      } catch {
+        // offline — fall back to whatever's already in localStorage
+      }
     }
 
     function uid() {
@@ -480,6 +626,8 @@
     const $detail = document.getElementById('detailView');
 
     function showList() {
+      currentPlanId = null;
+      localStorage.removeItem('current-plan-id');
       $detail.classList.add('hidden');
       $list.classList.remove('hidden');
       renderPlans();
@@ -487,6 +635,7 @@
 
     function showDetail(planId) {
       currentPlanId = planId;
+      localStorage.setItem('current-plan-id', planId);
       $list.classList.add('hidden');
       $detail.classList.remove('hidden');
       const plan = state.plans.find(p => p.id === planId);
@@ -544,38 +693,94 @@
     function buildNodeCard(node) {
       const card = document.createElement('div');
       card.className = 'node-card';
+      const titleHtml = node.title
+        ? esc(node.title)
+        : '<span class="node-title-placeholder">Untitled</span>';
       card.innerHTML = `
         <div class="node-title-row">
           <span class="node-drag-handle" title="Drag to reorder">⠿</span>
-          <input class="node-title-input" type="text" placeholder="Title" value="${esc(node.title)}" maxlength="120">
-          <button class="node-collapse-btn" title="Collapse">⌄</button>
-        </div>
-        <div class="node-desc-row">
-          <textarea class="node-desc-input" placeholder="Description...">${esc(node.desc)}</textarea>
+          <span class="node-title-display">${titleHtml}</span>
+          <button class="node-delete-btn" title="Delete node">✕</button>
         </div>
       `;
-      card.classList.add('collapsed');
 
-      const titleEl    = card.querySelector('.node-title-input');
-      const descEl     = card.querySelector('.node-desc-input');
-      const collapseEl = card.querySelector('.node-collapse-btn');
+      card.addEventListener('click', e => {
+        if (e.target.closest('.node-drag-handle, .node-delete-btn')) return;
+        openNodeModal(node);
+      });
 
-      titleEl.addEventListener('input', () => { node.title = titleEl.value; save(); });
-      descEl.addEventListener('input',  () => { node.desc  = descEl.value;  autoResize(descEl); save(); });
-
-      collapseEl.addEventListener('click', () => {
-        card.classList.toggle('collapsed');
+      card.querySelector('.node-delete-btn').addEventListener('click', e => {
+        e.stopPropagation();
+        deleteNode(node.id);
       });
 
       initDrag(card, node);
-      setTimeout(() => autoResize(descEl), 0);
       return card;
     }
 
-    function autoResize(el) {
-      el.style.height = 'auto';
-      el.style.height = el.scrollHeight + 'px';
+    let pendingDeleteId = null;
+
+    function deleteNode(nodeId) {
+      pendingDeleteId = nodeId;
+      document.getElementById('confirmModal').classList.remove('hidden');
     }
+
+    document.getElementById('confirmCancelBtn').addEventListener('click', () => {
+      pendingDeleteId = null;
+      document.getElementById('confirmModal').classList.add('hidden');
+    });
+
+    document.getElementById('confirmModal').addEventListener('click', e => {
+      if (e.target.id === 'confirmModal') {
+        pendingDeleteId = null;
+        document.getElementById('confirmModal').classList.add('hidden');
+      }
+    });
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+      const plan = state.plans.find(p => p.id === currentPlanId);
+      if (plan && pendingDeleteId) {
+        plan.nodes = plan.nodes.filter(n => n.id !== pendingDeleteId);
+        save();
+        renderNodes();
+      }
+      pendingDeleteId = null;
+      document.getElementById('confirmModal').classList.add('hidden');
+    });
+
+    /* ── Node detail modal ── */
+    let activeNode = null;
+
+    function openNodeModal(node) {
+      activeNode = node;
+      document.getElementById('nodeModalTitle').value = node.title;
+      document.getElementById('nodeModalDesc').value = node.desc;
+      document.getElementById('nodeModal').classList.remove('hidden');
+    }
+
+    function closeNodeModal() {
+      document.getElementById('nodeModal').classList.add('hidden');
+      activeNode = null;
+      renderNodes();
+    }
+
+    document.getElementById('nodeModalTitle').addEventListener('input', e => {
+      if (!activeNode) return;
+      activeNode.title = e.target.value;
+      save();
+    });
+
+    document.getElementById('nodeModalDesc').addEventListener('input', e => {
+      if (!activeNode) return;
+      activeNode.desc = e.target.value;
+      save();
+    });
+
+    document.getElementById('nodeModalCloseBtn').addEventListener('click', closeNodeModal);
+
+    document.getElementById('nodeModal').addEventListener('click', e => {
+      if (e.target.id === 'nodeModal') closeNodeModal();
+    });
 
     /* ── Drag to reorder ── */
     function initDrag(card, node) {
@@ -683,24 +888,77 @@
 
     /* ── "+ Add Node" ── */
     document.getElementById('addNodeBtn').addEventListener('click', () => {
+      document.getElementById('addNodeModal').classList.remove('hidden');
+      document.getElementById('nodeNameInput').value = '';
+      setTimeout(() => document.getElementById('nodeNameInput').focus(), 80);
+    });
+
+    document.getElementById('addNodeModal').addEventListener('click', e => {
+      if (e.target.id === 'addNodeModal') document.getElementById('addNodeModal').classList.add('hidden');
+    });
+
+    document.getElementById('nodeNameInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('createNodeBtn').click();
+    });
+
+    document.getElementById('createNodeBtn').addEventListener('click', () => {
+      const name = document.getElementById('nodeNameInput').value.trim();
+      if (!name) return;
       const plan = state.plans.find(p => p.id === currentPlanId);
-      const node = { id: uid(), title: '', desc: '' };
+      const node = { id: uid(), title: name, desc: '' };
       plan.nodes.push(node);
       save();
       const list = document.getElementById('nodeList');
       if (plan.nodes.length > 1) {
         list.appendChild(buildConnector(plan.nodes.length - 1));
       }
-      const card = buildNodeCard(node);
-      list.appendChild(card);
-      card.querySelector('.node-title-input').focus();
+      list.appendChild(buildNodeCard(node));
+      document.getElementById('addNodeModal').classList.add('hidden');
     });
 
     /* ── Back ── */
     document.getElementById('backBtn').addEventListener('click', showList);
 
     /* ── Init ── */
-    showList();
+    const savedPlanId = localStorage.getItem('current-plan-id');
+    if (savedPlanId && state.plans.some(p => p.id === savedPlanId)) {
+      showDetail(savedPlanId);
+    } else {
+      showList();
+    }
+
+    function isBusy() {
+      const openModal = ['modal', 'addNodeModal', 'nodeModal', 'confirmModal']
+        .some(id => !document.getElementById(id).classList.contains('hidden'));
+      const tag = document.activeElement && document.activeElement.tagName;
+      return openModal || tag === 'INPUT' || tag === 'TEXTAREA' || dirty;
+    }
+
+    async function refreshFromCloud() {
+      if (isBusy()) return;
+      await loadFromCloud();
+      if (currentPlanId && !$detail.classList.contains('hidden')) {
+        const plan = state.plans.find(p => p.id === currentPlanId);
+        if (plan) {
+          document.getElementById('detailTitle').value = plan.name;
+          renderNodes();
+        } else {
+          showList();
+        }
+      } else {
+        renderPlans();
+      }
+    }
+
+    refreshFromCloud();
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') refreshFromCloud();
+    });
+
+    setInterval(() => {
+      if (document.visibilityState === 'visible') refreshFromCloud();
+    }, 15000);
   </script>
 </body>
 </html>
